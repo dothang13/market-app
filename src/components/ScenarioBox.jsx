@@ -17,6 +17,8 @@ function ScenarioBox({ scenario, activeItem, onRegenerate, showAnswer, onToggleA
         <span>{activeItem ? `Nông sản ưu tiên: ${activeItem.name}` : 'Nông sản: Tự chọn tự động'}</span>
       </div>
 
+      {scenario.priceInfo ? <p className="scenario-box__price">{scenario.priceInfo}</p> : null}
+
       <p className="scenario-box__summary">{scenario.summary}</p>
       <p className="scenario-box__text">{scenario.text}</p>
 

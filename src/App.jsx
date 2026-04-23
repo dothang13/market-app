@@ -4,27 +4,37 @@ import ScenarioBox from './components/ScenarioBox';
 import { items } from './data/items';
 import './App.css';
 
-const names = ['A Vàng', 'Lan', 'Hồng Bắc', 'Y Nhi', 'Pơ Loong', 'Hải'];
+const names = ['chị Quế', 'chị Lâm', 'chị Phía', 'chị Mây', 'chị Hồng', 'chị Sương'];
 
 const eventTemplates = [
   {
     type: 'ban-hang',
-    verb: 'Bán (×)',
-    label: 'Bán hàng',
+    verb: 'Bán',
+    symbol: '×',
+    label: 'Bán (×)',
     title: 'Bài toán bán hàng',
-    summary: 'Tính số tiền thu được khi đem nông sản ra chợ phiên.',
+    summary: 'Luyện phép nhân từ giá bán ở chợ phiên.',
     allowedCategories: ['nong-san', 'vat-nuoi', 'tho-cam'],
-    buildScenario({ actor, item, quantity, extra }) {
+    buildScenario({ actor, item }) {
+      const quantity = getTwoDigitValue(10, 99);
       const variants = [
         {
           text: `${actor} mang ${quantity} ${item.unitMeasure} ${item.name.toLowerCase()} ra chợ. Mỗi ${item.unitMeasure} bán được ${item.price} đồng. Hỏi ${actor} thu về bao nhiêu đồng?`,
           expression: `${quantity} × ${item.price}`,
           result: quantity * item.price,
+          suffix: 'đồng',
         },
         {
-          text: `Sạp của ${actor} có ${quantity} ${item.unitMeasure} ${item.name.toLowerCase()} giống nhau. Nếu bán hết với giá ${item.price} đồng mỗi ${item.unitMeasure}, ${actor} nhận được bao nhiêu đồng?`,
+          text: `Sạp của ${actor} có ${quantity} ${item.unitMeasure} ${item.name.toLowerCase()}. Nếu bán hết với giá ${item.price} đồng mỗi ${item.unitMeasure}, ${actor} nhận được bao nhiêu đồng?`,
           expression: `${quantity} × ${item.price}`,
           result: quantity * item.price,
+          suffix: 'đồng',
+        },
+        {
+          text: `${actor} bán ${quantity} ${item.unitMeasure} ${item.name.toLowerCase()} trong một buổi chợ. Mỗi ${item.unitMeasure} giá ${item.price} đồng. Hỏi số tiền thu được là bao nhiêu?`,
+          expression: `${quantity} × ${item.price}`,
+          result: quantity * item.price,
+          suffix: 'đồng',
         },
       ];
 
@@ -33,104 +43,104 @@ const eventTemplates = [
   },
   {
     type: 'mua-hang',
-    verb: 'Trừ (-)',
-    label: 'Trừ đi',
-    title: 'Bài toán trừ đi',
-    summary: 'Luyện phép trừ qua các tình huống bớt, cho hoặc sử dụng.',
+    verb: 'Mua',
+    symbol: '-',
+    label: 'Mua (-)',
+    title: 'Bài toán mua hàng',
+    summary: 'Luyện phép trừ khi dùng tiền đi chợ.',
     allowedCategories: ['nong-san', 'vat-nuoi', 'tho-cam'],
-    buildScenario({ actor, item, quantity, extra }) {
-      const total = quantity + extra;
-      const variants = [];
-
-      if (item.category === 'vat-nuoi') {
-        variants.push({
-          text: `${actor} có ${total} ${item.unitMeasure} ${item.name.toLowerCase()} trong chuồng. ${actor} cho đi ${extra} ${item.unitMeasure}. Hỏi còn lại bao nhiêu ${item.unitMeasure}?`,
-          expression: `${total} - ${extra}`,
-          result: total - extra,
-        });
-        variants.push({
-          text: `${actor} nuôi được ${total} ${item.unitMeasure} ${item.name.toLowerCase()}, sau đó bán ${extra} ${item.unitMeasure}. Hỏi còn lại bao nhiêu?`,
-          expression: `${total} - ${extra}`,
-          result: total - extra,
-        });
-      } else if (item.category === 'nong-san') {
-        variants.push({
-          text: `${actor} có ${total} ${item.unitMeasure} ${item.name.toLowerCase()} ở vườn. ${actor} dùng ${extra} ${item.unitMeasure} để ăn. Hỏi còn lại bao nhiêu ${item.unitMeasure}?`,
-          expression: `${total} - ${extra}`,
-          result: total - extra,
-        });
-        variants.push({
-          text: `${actor} thu hoạch được ${total} ${item.unitMeasure} ${item.name.toLowerCase()}, sau đó tặng ${extra} ${item.unitMeasure} cho hàng xóm. Hỏi còn lại bao nhiêu?`,
-          expression: `${total} - ${extra}`,
-          result: total - extra,
-        });
-      } else {
-        variants.push({
-          text: `${actor} có ${total} ${item.unitMeasure} ${item.name.toLowerCase()}. ${actor} cho đi ${extra} ${item.unitMeasure}. Hỏi còn lại bao nhiêu ${item.unitMeasure}?`,
-          expression: `${total} - ${extra}`,
-          result: total - extra,
-        });
-      }
+    buildScenario({ actor, item }) {
+      const startMoney = getTwoDigitValue(20, 99);
+      const spendMoney = getOneDigitValue(1, Math.min(9, startMoney - 10));
+      const variants = [
+        {
+          text: `${actor} có ${startMoney} đồng. ${actor} mua ${item.name.toLowerCase()} hết ${spendMoney} đồng. Hỏi còn lại bao nhiêu đồng?`,
+          expression: `${startMoney} - ${spendMoney}`,
+          result: startMoney - spendMoney,
+          suffix: 'đồng',
+        },
+        {
+          text: `${actor} cầm ${startMoney} đồng đi chợ và mua ${item.name.toLowerCase()} giá ${spendMoney} đồng. Hỏi sau khi mua xong còn bao nhiêu đồng?`,
+          expression: `${startMoney} - ${spendMoney}`,
+          result: startMoney - spendMoney,
+          suffix: 'đồng',
+        },
+        {
+          text: `Trong túi ${actor} có ${startMoney} đồng. Nếu mua ${item.name.toLowerCase()} mất ${spendMoney} đồng, ${actor} còn lại bao nhiêu đồng?`,
+          expression: `${startMoney} - ${spendMoney}`,
+          result: startMoney - spendMoney,
+          suffix: 'đồng',
+        },
+      ];
 
       return getRandomFrom(variants);
     },
   },
   {
-    type: 'de-them',
-    verb: 'Đẻ thêm (+)',
-    label: 'Đẻ thêm',
-    title: 'Bài toán đẻ thêm',
-    summary: 'Luyện phép cộng qua câu chuyện vật nuôi tăng lên.',
-    allowedCategories: ['vat-nuoi'],
-    buildScenario({ actor, item, quantity, extra }) {
-      const variants = [];
-      if (item.category === 'nong-san') {
-        variants.push({
-          text: `${actor} thu hoạch được ${quantity} ${item.unitMeasure} ${item.name.toLowerCase()}. Nếu bán mỗi ${item.unitMeasure} được ${item.price} đồng, hỏi thu về bao nhiêu?`,
-          expression: `${quantity} × ${item.price}`,
-          result: quantity * item.price,
-        });
-        variants.push({
-          text: `${actor} thu hoạch ${quantity} ${item.unitMeasure} ${item.name.toLowerCase()} hôm nay. Giá mỗi ${item.unitMeasure} là ${item.price} đồng. Hỏi tổng tiền thu được?`,
-          expression: `${quantity} × ${item.price}`,
-          result: quantity * item.price,
-        });
-      } else if (item.category === 'vat-nuoi') {
-        variants.push({
-          text: `${actor} có ${quantity} ${item.unitMeasure} ${item.name.toLowerCase()} để bán. Mỗi ${item.unitMeasure} được ${item.price} đồng. Hỏi tổng tiền thu được?`,
-          expression: `${quantity} × ${item.price}`,
-          result: quantity * item.price,
-        });
-      } else {
-        variants.push({
-          text: `${actor} có ${quantity} ${item.unitMeasure} ${item.name.toLowerCase()}. Nếu bán với giá ${item.price} đồng mỗi ${item.unitMeasure}, hỏi thu về bao nhiêu?`,
-          expression: `${quantity} × ${item.price}`,
-          result: quantity * item.price,
-        });
-      }
+    type: 'them',
+    verb: 'Thêm',
+    symbol: '+',
+    label: 'Thêm (+)',
+    title: 'Bài toán thêm',
+    summary: 'Luyện phép cộng với nông sản hoặc vật nuôi được thêm vào.',
+    allowedCategories: ['nong-san', 'vat-nuoi', 'tho-cam'],
+    buildScenario({ actor, item }) {
+      const baseCount = getTwoDigitValue();
+      const extraCount = getOneDigitValue();
+      const variants = [
+        {
+          text: `${actor} ban đầu có ${baseCount} ${item.unitMeasure} ${item.name.toLowerCase()}. Sau đó có thêm ${extraCount} ${item.unitMeasure}. Hỏi bây giờ ${actor} có tất cả bao nhiêu ${item.unitMeasure}?`,
+          expression: `${baseCount} + ${extraCount}`,
+          result: baseCount + extraCount,
+          suffix: item.unitMeasure,
+        },
+        {
+          text: `Buổi sáng ${actor} đếm được ${baseCount} ${item.unitMeasure} ${item.name.toLowerCase()}, buổi chiều có thêm ${extraCount} ${item.unitMeasure}. Hỏi cuối ngày có tất cả bao nhiêu ${item.unitMeasure}?`,
+          expression: `${baseCount} + ${extraCount}`,
+          result: baseCount + extraCount,
+          suffix: item.unitMeasure,
+        },
+        {
+          text: `${actor} đã chuẩn bị ${baseCount} ${item.unitMeasure} ${item.name.toLowerCase()}. Sau đó bà con đem tới thêm ${extraCount} ${item.unitMeasure}. Hỏi tổng cộng có bao nhiêu ${item.unitMeasure}?`,
+          expression: `${baseCount} + ${extraCount}`,
+          result: baseCount + extraCount,
+          suffix: item.unitMeasure,
+        },
+      ];
 
       return getRandomFrom(variants);
     },
   },
   {
     type: 'chia-phan',
-    verb: 'Chia (÷)',
-    label: 'Chia phần',
+    verb: 'Chia',
+    symbol: '÷',
+    label: 'Chia (÷)',
     title: 'Bài toán chia phần',
     summary: 'Luyện phép chia đều cho bạn bè hoặc các nhóm.',
     allowedCategories: ['nong-san', 'vat-nuoi', 'tho-cam'],
-    buildScenario({ actor, item, quantity, extra }) {
-      const total = quantity * extra;
+    buildScenario({ actor, item }) {
+      const divisor = getOneDigitValue(2, 9);
+      const quotient = getTwoDigitValue(10, 99);
+      const total = divisor * quotient;
       const variants = [
         {
-          text: `${actor} có ${total} ${item.unitMeasure} ${item.name.toLowerCase()} để chia đều cho ${quantity} bạn nhỏ. Hỏi mỗi bạn nhận được bao nhiêu ${item.unitMeasure}?`,
-          expression: `${total} ÷ ${quantity}`,
-          result: total / quantity,
+          text: `${actor} có ${total} ${item.unitMeasure} ${item.name.toLowerCase()} để chia đều cho ${divisor} bạn nhỏ. Hỏi mỗi bạn nhận được bao nhiêu ${item.unitMeasure}?`,
+          expression: `${total} ÷ ${divisor}`,
+          result: quotient,
+          suffix: item.unitMeasure,
         },
         {
-          text: `Lớp học của ${actor} có ${total} ${item.unitMeasure} ${item.name.toLowerCase()}. Cô giáo chia đều cho ${quantity} nhóm. Hỏi mỗi nhóm được mấy ${item.unitMeasure}?`,
-          expression: `${total} ÷ ${quantity}`,
-          result: total / quantity,
+          text: `Lớp học của ${actor} có ${total} ${item.unitMeasure} ${item.name.toLowerCase()}. Cô giáo chia đều cho ${divisor} nhóm. Hỏi mỗi nhóm được mấy ${item.unitMeasure}?`,
+          expression: `${total} ÷ ${divisor}`,
+          result: quotient,
+          suffix: item.unitMeasure,
+        },
+        {
+          text: `${actor} gom ${total} ${item.unitMeasure} ${item.name.toLowerCase()} để phát đều cho ${divisor} gia đình. Hỏi mỗi gia đình nhận được bao nhiêu ${item.unitMeasure}?`,
+          expression: `${total} ÷ ${divisor}`,
+          result: quotient,
+          suffix: item.unitMeasure,
         },
       ];
 
@@ -139,15 +149,14 @@ const eventTemplates = [
   },
 ];
 
-const animalOptions = items.filter((item) => item.category === 'vat-nuoi');
-
 const createInitialScenario = () => ({
   type: 'san-sang',
   label: 'Sẵn sàng',
-  title: 'Chọn một động từ để bắt đầu',
-  summary: 'Học viên quay vòng xoay ra sự việc nào thì bấm đúng nút đó.',
-  text: 'Bấm vào một nút động từ như Bán, Mua, Đẻ thêm hoặc Chia để mở sang trang câu hỏi ngẫu nhiên.',
+  title: 'Chọn phép tính và chọn món',
+  summary: 'Học viên quay ra phép tính nào thì bấm đúng ô đó, sau đó chọn nông sản hoặc vật nuôi.',
+  text: 'Chọn một trong bốn ô phép tính rồi chọn món ở ngay bên dưới để hiện câu hỏi.',
   answer: null,
+  priceInfo: '',
 });
 
 function getRandomInt(min, max) {
@@ -158,41 +167,43 @@ function getRandomFrom(list) {
   return list[getRandomInt(0, list.length - 1)];
 }
 
-function getEligibleItems(nextItems, template, preferredItemId) {
-  const allowedItems = nextItems.filter((item) =>
-    template.allowedCategories.includes(item.category),
-  );
-
-  if (preferredItemId) {
-    const matchedItem = allowedItems.find((item) => item.id === preferredItemId);
-    if (matchedItem) {
-      return matchedItem;
-    }
-  }
-
-  return getRandomFrom(allowedItems);
+function getTwoDigitValue(min = 10, max = 99) {
+  return getRandomInt(Math.max(10, min), Math.max(10, max));
 }
 
-function buildScenario(nextItems, eventType, preferredItemId) {
-  const template = eventTemplates.find((entry) => entry.type === eventType) ?? eventTemplates[0];
-  const item = getEligibleItems(nextItems, template, preferredItemId);
-  const quantity = getRandomInt(2, 8);
-  const extra = getRandomInt(2, 5);
+function getOneDigitValue(min = 1, max = 9) {
+  return getRandomInt(Math.max(1, min), Math.min(9, max));
+}
+
+function getTemplate(eventType) {
+  return eventTemplates.find((entry) => entry.type === eventType) ?? eventTemplates[0];
+}
+
+function getAllowedItems(nextItems, eventType) {
+  const template = getTemplate(eventType);
+  return nextItems.filter((item) => template.allowedCategories.includes(item.category));
+}
+
+function buildScenario(nextItems, eventType, itemId) {
+  const template = getTemplate(eventType);
+  const item = nextItems.find((entry) => entry.id === itemId) ?? getAllowedItems(nextItems, eventType)[0];
   const actor = getRandomFrom(names);
-  const scenarioData = template.buildScenario({ actor, item, quantity, extra });
+  const scenarioData = template.buildScenario({ actor, item });
+  const suffix = scenarioData.suffix ? ` ${scenarioData.suffix}` : '';
 
   return {
     type: template.type,
     label: template.label,
-    title: template.title,
+    title: `${template.title} (${template.symbol})`,
     summary: template.summary,
     text: scenarioData.text,
     itemId: item.id,
     verb: template.verb,
+    priceInfo: `Giá chợ phiên hiện tại: ${item.name} ${item.price} ${item.unit}.`,
     answer: {
-      expression: scenarioData.expression,
-      result: scenarioData.result,
-      statement: `${scenarioData.expression} = ${scenarioData.result}`,
+      expression: `${scenarioData.expression}${suffix}`,
+      result: `${scenarioData.result}${suffix}`,
+      statement: `${scenarioData.expression} = ${scenarioData.result}${suffix}`,
     },
   };
 }
@@ -201,7 +212,7 @@ function App() {
   const [currentPrices, setCurrentPrices] = useState(items);
   const [scenario, setScenario] = useState(createInitialScenario);
   const [marketRound, setMarketRound] = useState(0);
-  const [focusedItemId, setFocusedItemId] = useState(null);
+  const [selectedItemId, setSelectedItemId] = useState(null);
   const [activeEventType, setActiveEventType] = useState(null);
   const [currentView, setCurrentView] = useState('market');
   const [showAnswer, setShowAnswer] = useState(false);
@@ -246,52 +257,46 @@ function App() {
 
     setCurrentPrices(updatedItems);
     setMarketRound((round) => round + 1);
+    setSelectedItemId(null);
+    setActiveEventType(null);
+    setCurrentView('market');
+    setScenario(createInitialScenario());
+    setShowAnswer(false);
+    playTing();
+  };
+
+  const handleSelectEvent = (eventType) => {
+    setActiveEventType(eventType);
+    setSelectedItemId(null);
+    setCurrentView('picker');
+    setScenario({
+      ...createInitialScenario(),
+      label: getTemplate(eventType).label,
+      title: `Chọn món cho phép ${getTemplate(eventType).label}`,
+      summary: 'Bấm chọn nông sản hoặc vật nuôi ở ngay dưới để hiện câu hỏi.',
+      text: 'Câu hỏi sẽ xuất hiện ngay bên dưới sau khi bạn chọn món.',
+    });
+    setShowAnswer(false);
     playTing();
   };
 
   const handleSelectItem = (itemId) => {
-    setFocusedItemId((currentId) => (currentId === itemId ? null : itemId));
-    playTing();
-  };
+    setSelectedItemId(itemId);
 
-  const openScenarioPage = (eventType) => {
-    // Open the question view but don't generate a question yet.
-    // Show the allowed items for the selected verb and wait for user to pick.
-    setActiveEventType(eventType);
-    setFocusedItemId(null);
-    setScenario(createInitialScenario());
-    setShowAnswer(false);
-    setCurrentView('question');
+    if (activeEventType) {
+      setScenario(buildScenario(currentPrices, activeEventType, itemId));
+      setShowAnswer(false);
+    }
+
     playTing();
   };
 
   const regenerateScenario = () => {
-    if (!activeEventType) {
+    if (!activeEventType || !selectedItemId) {
       return;
     }
 
-    setScenario(buildScenario(currentPrices, activeEventType, focusedItemId));
-    setShowAnswer(false);
-    playTing();
-  };
-
-  const goBackToMarket = () => {
-    setCurrentView('market');
-    setShowAnswer(false);
-    playTing();
-  };
-
-  const handlePickAllowedItem = (itemId) => {
-    setFocusedItemId(itemId);
-    // Immediately create a scenario for the selected verb+item
-    setScenario(buildScenario(currentPrices, activeEventType, itemId));
-    setShowAnswer(false);
-    playTing();
-  };
-
-  const createQuestionFromSelection = () => {
-    if (!activeEventType || !focusedItemId) return;
-    setScenario(buildScenario(currentPrices, activeEventType, focusedItemId));
+    setScenario(buildScenario(currentPrices, activeEventType, selectedItemId));
     setShowAnswer(false);
     playTing();
   };
@@ -301,7 +306,16 @@ function App() {
     playTing();
   };
 
-  const focusedItem = currentPrices.find((item) => item.id === focusedItemId);
+  const goBackToMarket = () => {
+    setCurrentView('market');
+    setSelectedItemId(null);
+    setShowAnswer(false);
+    setScenario(createInitialScenario());
+    playTing();
+  };
+
+  const allowedItems = activeEventType ? getAllowedItems(currentPrices, activeEventType) : [];
+  const selectedItem = currentPrices.find((item) => item.id === selectedItemId);
 
   return (
     <main className="app-shell">
@@ -325,8 +339,8 @@ function App() {
                   <span>Phiên chợ</span>
                 </div>
                 <div className="hero-stat">
-                  <strong>{focusedItem ? focusedItem.name : 'Tự do'}</strong>
-                  <span>Nông sản ưu tiên</span>
+                  <strong>{selectedItem ? selectedItem.name : 'Chưa chọn'}</strong>
+                  <span>Món đang chọn</span>
                 </div>
               </div>
             </div>
@@ -336,16 +350,16 @@ function App() {
                 Cập nhật giá Chợ
               </button>
               <p className="hero-hint">
-                Muốn đổi dữ liệu phiên chợ thì bấm nút này trước khi chọn động từ.
+                Chọn phép tính trước, sau đó sang bước 2 để chọn món và xem câu hỏi.
               </p>
             </div>
           </section>
 
-          <section className="verb-section" aria-label="Nút động từ">
+          <section className="verb-section" aria-label="Bốn phép tính">
             <div className="section-heading">
               <div>
-                <h2>Nút động từ</h2>
-                <p>Khi vòng xoay ra sự việc nào, chỉ cần bấm đúng nút đó để sang trang câu hỏi.</p>
+                <h2>Bốn phép tính</h2>
+                <p>Bán là nhân, Mua là trừ, Thêm là cộng, Chia là phép chia.</p>
               </div>
             </div>
 
@@ -354,12 +368,12 @@ function App() {
                 <button
                   key={event.type}
                   type="button"
-                  className={`verb-card verb-card--${event.type}`}
-                  onClick={() => openScenarioPage(event.type)}
+                  className={`verb-card verb-card--${event.type}${activeEventType === event.type ? ' is-active' : ''}`}
+                  onClick={() => handleSelectEvent(event.type)}
                   style={{ animationDelay: `${index * 90}ms` }}
                 >
-                  <span className="verb-card__mini">Bấm để mở câu hỏi</span>
-                  <strong>{event.verb}</strong>
+                  <span className="verb-card__mini">Bước 1</span>
+                  <strong>{event.label}</strong>
                   <span>{event.summary}</span>
                 </button>
               ))}
@@ -370,11 +384,7 @@ function App() {
             <div className="section-heading">
               <div>
                 <h2>Giá hôm nay</h2>
-                <p>Chạm vào từng thẻ để ưu tiên món đó trong câu hỏi kế tiếp.</p>
-              </div>
-
-              <div className="market-badge">
-                {focusedItem ? `Đang ghim: ${focusedItem.name}` : 'Chưa ghim nông sản'}
+                <p>Xem giá hiện tại của các món để chuẩn bị cho câu hỏi.</p>
               </div>
             </div>
 
@@ -385,83 +395,54 @@ function App() {
                   item={item}
                   marketRound={marketRound}
                   delay={index * 80}
-                  isActive={item.id === focusedItemId}
+                  isActive={item.id === selectedItemId}
                   onSelect={handleSelectItem}
                 />
               ))}
             </div>
           </section>
         </section>
-      ) : (
+      ) : null}
+
+      {currentView === 'picker' ? (
         <section className="screen-page screen-page--question">
           <section className="question-panel">
             <div className="question-panel__top">
               <button type="button" className="back-button" onClick={goBackToMarket}>
-                ← Quay lại bảng giá
+                ← Quay lại bước chọn phép tính
               </button>
-              <div className="question-panel__badge">
-                {activeEventType ? eventTemplates.find((event) => event.type === activeEventType)?.verb : ''}
-              </div>
+              <div className="question-panel__badge">{getTemplate(activeEventType).label}</div>
             </div>
 
-            {activeEventType ? (
-              <div className="item-picker">
-                <p className="item-picker__label">Chọn nông sản hoặc vật nuôi (theo động từ)</p>
-                <div className="item-picker__options">
-                  {currentPrices
-                    .filter((it) =>
-                      eventTemplates
-                        .find((e) => e.type === activeEventType)
-                        .allowedCategories.includes(it.category),
-                    )
-                    .map((item) => (
-                      <button
-                          key={item.id}
-                          type="button"
-                          data-category={item.category}
-                          className={`item-option${focusedItemId === item.id ? ' is-active' : ''}`}
-                          onClick={() => handlePickAllowedItem(item.id)}
-                        >
-                        <span>{item.icon}</span>
-                        <strong>{item.name}</strong>
-                        <small>{item.unit} · {item.price} đồng</small>
-                      </button>
-                    ))}
-                </div>
-
-                <div className="item-picker__actions">
-                  <button type="button" className="ghost-button" onClick={goBackToMarket}>
-                    Hủy chọn
+            <div className="item-picker">
+              <p className="item-picker__label">Bước 2: Chọn nông sản hoặc vật nuôi</p>
+              <div className="item-picker__options">
+                {allowedItems.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`item-option${selectedItemId === item.id ? ' is-active' : ''}`}
+                    data-category={item.category}
+                    onClick={() => handleSelectItem(item.id)}
+                  >
+                    <span>{item.icon}</span>
+                    <strong>{item.name}</strong>
+                    <small>{item.price} {item.unit}</small>
                   </button>
-                </div>
+                ))}
               </div>
-            ) : null}
-
-            {focusedItemId && scenario && scenario.type !== 'san-sang' ? (
-              <ScenarioBox
-                scenario={scenario}
-                activeItem={focusedItem}
-                onRegenerate={regenerateScenario}
-                showAnswer={showAnswer}
-                onToggleAnswer={toggleAnswer}
-              />
-            ) : (
-              <div className="picker-instruction">
-                <p>Chọn một sản phẩm ở phía trên để tạo câu hỏi tương ứng.</p>
-              </div>
-            )}
-
-            <div className="question-actions">
-              <button type="button" className="scenario-box__action" onClick={regenerateScenario}>
-                Câu hỏi khác cùng động từ
-              </button>
-              <button type="button" className="ghost-button" onClick={goBackToMarket}>
-                Chọn động từ khác
-              </button>
             </div>
+
+            <ScenarioBox
+              scenario={scenario}
+              activeItem={selectedItem}
+              onRegenerate={regenerateScenario}
+              showAnswer={showAnswer}
+              onToggleAnswer={toggleAnswer}
+            />
           </section>
         </section>
-      )}
+      ) : null}
     </main>
   );
 }

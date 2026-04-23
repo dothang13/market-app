@@ -229,6 +229,14 @@
   filter: saturate(1.08);
 }
 
+.scenario-box__action:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  filter: none;
+  box-shadow: none;
+}
+
 .hero-hint {
   position: relative;
   z-index: 1;
@@ -308,6 +316,11 @@
 
 .verb-card:hover {
   transform: translateY(-5px) scale(1.01);
+}
+
+.verb-card.is-active {
+  outline: 3px solid rgba(255, 245, 220, 0.5);
+  box-shadow: 0 22px 38px rgba(31, 66, 42, 0.22);
 }
 
 .verb-card__mini {
@@ -441,6 +454,10 @@
 }
 
 .verb-card--de-them {
+  background: linear-gradient(145deg, #4f8b46, #2e6b35);
+}
+
+.verb-card--them {
   background: linear-gradient(145deg, #4f8b46, #2e6b35);
 }
 
@@ -663,6 +680,16 @@
   color: rgba(23, 54, 32, 0.72);
 }
 
+.scenario-box__price {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(29, 75, 46, 0.1);
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--forest-deep);
+}
+
 .scenario-box__text {
   font-size: clamp(1.5rem, 2.7vw, 2.25rem);
   line-height: 1.55;
@@ -818,32 +845,16 @@
   font-weight: 800;
 }
 
-.back-button,
-.ghost-button {
+.back-button {
   padding: 14px 18px;
+  border: none;
   border-radius: 18px;
+  background: linear-gradient(135deg, var(--forest), var(--forest-deep));
+  color: #fffef9;
   font-size: 1rem;
   font-weight: 800;
   cursor: pointer;
-}
-
-.back-button {
-  border: none;
-  background: linear-gradient(135deg, var(--forest), var(--forest-deep));
-  color: #fffef9;
   box-shadow: 0 12px 22px rgba(29, 75, 46, 0.18);
-}
-
-.ghost-button {
-  border: 1px solid rgba(29, 75, 46, 0.14);
-  background: rgba(255, 255, 255, 0.72);
-  color: var(--forest-deep);
-}
-
-.question-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
 }
 
 @keyframes pricePulse {
@@ -909,7 +920,11 @@
   }
 
   .section-heading,
-  .scenario-box__header,
+  .scenario-box__header {
+    flex-direction: column;
+    align-items: start;
+  }
+
   .question-panel__top {
     flex-direction: column;
     align-items: start;
@@ -927,21 +942,16 @@
 
   .btn-refresh,
   .scenario-box__action,
-  .back-button,
-  .ghost-button {
+  .back-button {
     width: 100%;
-  }
-
-  .question-actions {
-    flex-direction: column;
-  }
-
-  .animal-picker__options {
-    flex-direction: column;
   }
 
   .animal-option,
   .answer-toggle__button {
     width: 100%;
+  }
+
+  .item-picker__actions {
+    flex-direction: column;
   }
 }
